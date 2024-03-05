@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>電子レンジ時間計算</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            filter: drop-shadow(0px 0px 10px rgba(0,0,0,0.1));
+            width: 80%;
+            max-width: 300px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 4px;
+            border: none;
+            color: #fff;
+            background-color: #007BFF;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        #notification {
+            position: fixed;
+            right: -320px;
+            top: 20px;
+            width: 80%;
+            max-width: 280px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            filter: drop-shadow(0px 0px 10px rgba(0,0,0,0.1));
+            transition: right 0.5s ease-in-out;
+        }
+        #notification.show {
+            right: 10%;
+        }
+        #notification.success {
+            border-left: 5px solid #4CAF50;
+        }
+        #notification.error {
+            border-left: 5px solid #F44336;
+        }
+    </style>
+</head>
+<body>
+    <form id="calcForm">
+        <label for="minutes">分</label>
+        <input type="number" id="minutes" name="minutes">
+        <label for="seconds">秒</label>
+        <input type="number" id="seconds" name="seconds">
+        <label for="w1">元のW数</label>
+        <input type="number" id="w1" name="w1">
+        <label for="w2">新しいW数</label>
+        <input type="number" id="w2" name="w2">
+        <input type="submit" value="計算">
+    </form>
+    <div id="notification"></div>
+
+    <script>
+        document.getElementById('calcForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var minutes = parseInt(document.getElementById('minutes').value);
+            var seconds = parseInt(document.getElementById('seconds').value);
+            var w1 = parseInt(document.getElementById('w1').value);
+            var w2 = parseInt(document.getElementById('w2').value);
+
+            if (isNaN(minutes) || isNaN(seconds) || isNaN(w1) || isNaN(w2)) {
+                showError('全てのフィールドの入力を済ませてください。');
+                return;
+            }
+
+            if (!Number.isInteger(minutes) || !Number.isInteger(seconds) || !Number.isInteger(w1) || !Number.isInteger(w2)) {
+                showError('数字のみを入力してください。');
+                return;
+            }
+
+            var total_seconds = minutes * 60 + seconds;
+
+            var required_seconds = total_seconds * w1 / w2;
+            var required_minutes = Math.floor(required_seconds / 60);
+            required_seconds = Math.round(required_seconds % 60);
+
+            if (!isFinite(required_minutes) || isNaN(required_seconds)) {
+                showError('計算に失敗しました。');
+                return;
+            }
+
+            showSuccess('必要な時間: ' + required_minutes + '分 ' + required_seconds + '秒');
+        });
+
+        function showError(message) {
+            var notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show', 'error');
+            setTimeout(function() {
+                notification.classList.remove('show', 'error');
+            }, 3000);
+        }
+
+        function showSuccess(message) {
+            var notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show', 'success');
+            setTimeout(function() {
+                notification.classList.remove('show', 'success');
+            }, 6000);
+        }
+    </script>
+</body>
+</html>
